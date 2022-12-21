@@ -15,12 +15,15 @@ import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Car {
+@Relation(collectionRelation = "cars")
+public class Car extends RepresentationModel<Car> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

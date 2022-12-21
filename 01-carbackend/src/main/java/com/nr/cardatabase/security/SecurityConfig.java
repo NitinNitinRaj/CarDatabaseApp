@@ -30,8 +30,15 @@ public class SecurityConfig {
       customAuthenticationManger
     );
     authenticationFilter.setFilterProcessesUrl("/authenticate");
-    http.csrf().disable().cors().and().authorizeRequests().anyRequest().permitAll();
-  /*   http
+    http
+      .csrf()
+      .disable()
+      .cors()
+      .and()
+      .authorizeRequests()
+      .anyRequest()
+      .permitAll();
+    /*   http
       .headers()
       .frameOptions()
       .disable()
@@ -59,7 +66,7 @@ public class SecurityConfig {
   CorsConfigurationSource corsConfigurationSource() {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(Arrays.asList("*"));
+    config.setAllowedOriginPatterns(Arrays.asList("*"));
     config.setAllowedMethods(Arrays.asList("*"));
     config.setAllowedHeaders(Arrays.asList("*"));
     config.setAllowCredentials(true);

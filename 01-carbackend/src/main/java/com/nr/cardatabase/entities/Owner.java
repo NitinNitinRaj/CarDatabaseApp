@@ -14,13 +14,16 @@ import javax.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
+import org.springframework.hateoas.server.core.Relation;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@Relation(collectionRelation = "owners")
 @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
-public class Owner {
+public class Owner extends RepresentationModel<Owner> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

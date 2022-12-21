@@ -4,8 +4,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.nr.cardatabase.entities.Car;
-import com.nr.cardatabase.representationalModels.CarRepresentationalModel;
-import com.nr.cardatabase.representationalModels.OwnerRepresentationalModel;
+import com.nr.cardatabase.entities.Owner;
 import com.nr.cardatabase.service.CarService;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,13 +30,13 @@ public class CarController {
   private final CarService carService;
 
   @GetMapping
-  public ResponseEntity<CollectionModel<CarRepresentationalModel>> getCars() {
-    List<CarRepresentationalModel> collection = carService
+  public ResponseEntity<CollectionModel<Car>> getCars() {
+    List<Car> collection = carService
       .getAllCars()
       .stream()
-      .map(CarRepresentationalModel::new)
+      .map(car -> addLinks(car.getId(), car))
       .collect(Collectors.toList());
-    CollectionModel<CarRepresentationalModel> cars = CollectionModel.of(
+    CollectionModel<Car> cars = CollectionModel.of(
       collection,
       linkTo(methodOn(CarController.class).getCars()).withSelfRel(),
       linkTo(methodOn(Controller.class).getSearchLinks()).withRel("search")
@@ -46,21 +45,15 @@ public class CarController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<CarRepresentationalModel> getCar(
-    @PathVariable Long id
-  ) {
-    return new ResponseEntity<>(
-      new CarRepresentationalModel(carService.getCar(id)),
-      HttpStatus.OK
-    );
+  public ResponseEntity<Car> getCar(@PathVariable Long id) {
+    Car car = carService.getCar(id);
+    return new ResponseEntity<>(addLinks(id, car), HttpStatus.OK);
   }
 
   @GetMapping("/{id}/owner")
-  public ResponseEntity<OwnerRepresentationalModel> getOwnerOfCar(
-    @PathVariable Long id
-  ) {
+  public ResponseEntity<Owner> getOwnerOfCar(@PathVariable Long id) {
     return new ResponseEntity<>(
-      new OwnerRepresentationalModel(carService.getOwnerById(id)),
+      OwnerController.addLinks(id, carService.getOwnerById(id)),
       HttpStatus.OK
     );
   }
@@ -72,61 +65,61 @@ public class CarController {
   }
 
   @PostMapping
-  public ResponseEntity<CarRepresentationalModel> postCar(
-    @Valid @RequestBody Car car
-  ) {
+  public ResponseEntity<Car> postCar(@Valid @RequestBody Car car) {
+    Car savedCar = carService.saveCar(car);
     return new ResponseEntity<>(
-      new CarRepresentationalModel(carService.saveCar(car)),
+      addLinks(savedCar.getId(), savedCar),
       HttpStatus.CREATED
     );
   }
 
   @PostMapping("/owner/{ownerId}")
-  public ResponseEntity<CarRepresentationalModel> postCarWithOwner(
+  public ResponseEntity<Car> postCarWithOwner(
     @Valid @RequestBody Car car,
     @PathVariable Long ownerId
   ) {
+    Car savedCar = carService.saveCarWithOwner(car, ownerId);
     return new ResponseEntity<>(
-      new CarRepresentationalModel(carService.saveCarWithOwner(car, ownerId)),
+      addLinks(savedCar.getId(), savedCar),
       HttpStatus.CREATED
     );
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<CarRepresentationalModel> putCar(
+  public ResponseEntity<Car> putCar(
     @Valid @RequestBody Car car,
     @PathVariable Long id
   ) {
+    Car savedCar = carService.updateCar(car, id);
     return new ResponseEntity<>(
-      new CarRepresentationalModel(carService.updateCar(car, id)),
+      addLinks(savedCar.getId(), savedCar),
       HttpStatus.OK
     );
   }
 
   @PutMapping("/{id}/owner/{ownerId}")
-  public ResponseEntity<CarRepresentationalModel> putCarWithOwner(
+  public ResponseEntity<Car> putCarWithOwner(
     @Valid @RequestBody Car car,
     @PathVariable Long id,
     @PathVariable Long ownerId
   ) {
+    Car savedCar = carService.updateCarWithOwner(car, id, ownerId);
     return new ResponseEntity<>(
-      new CarRepresentationalModel(
-        carService.updateCarWithOwner(car, id, ownerId)
-      ),
+      addLinks(savedCar.getId(), savedCar),
       HttpStatus.OK
     );
   }
 
   @GetMapping("/owner/{ownerId}")
-  public ResponseEntity<CollectionModel<CarRepresentationalModel>> getOwnersCar(
+  public ResponseEntity<CollectionModel<Car>> getOwnersCar(
     @PathVariable Long ownerId
   ) {
-    List<CarRepresentationalModel> collection = carService
+    List<Car> collection = carService
       .getOwnersCar(ownerId)
       .stream()
-      .map(CarRepresentationalModel::new)
+      .map(car -> addLinks(car.getId(), car))
       .collect(Collectors.toList());
-    CollectionModel<CarRepresentationalModel> cars = CollectionModel.of(
+    CollectionModel<Car> cars = CollectionModel.of(
       collection,
       linkTo(methodOn(CarController.class).getOwnersCar(null)).withSelfRel(),
       linkTo(methodOn(CarController.class).getOwnersCar(null))
@@ -145,15 +138,15 @@ public class CarController {
   }
 
   @GetMapping("/search/color/{color}")
-  public ResponseEntity<CollectionModel<CarRepresentationalModel>> getCarByColor(
+  public ResponseEntity<CollectionModel<Car>> getCarByColor(
     @PathVariable String color
   ) {
-    List<CarRepresentationalModel> collection = carService
+    List<Car> collection = carService
       .getCarByColor(color)
       .stream()
-      .map(CarRepresentationalModel::new)
+      .map(car -> addLinks(car.getId(), car))
       .collect(Collectors.toList());
-    CollectionModel<CarRepresentationalModel> cars = CollectionModel.of(
+    CollectionModel<Car> cars = CollectionModel.of(
       collection,
       linkTo(methodOn(CarController.class).getCarByColor(null)).withSelfRel(),
       linkTo(methodOn(CarController.class).getCarByColor(null))
@@ -163,20 +156,29 @@ public class CarController {
   }
 
   @GetMapping("/search/brand/{brand}")
-  public ResponseEntity<CollectionModel<CarRepresentationalModel>> getCarByBrand(
+  public ResponseEntity<CollectionModel<Car>> getCarByBrand(
     @PathVariable String brand
   ) {
-    List<CarRepresentationalModel> collection = carService
+    List<Car> collection = carService
       .getCarByBrand(brand)
       .stream()
-      .map(CarRepresentationalModel::new)
+      .map(car -> addLinks(car.getId(), car))
       .collect(Collectors.toList());
-    CollectionModel<CarRepresentationalModel> cars = CollectionModel.of(
+    CollectionModel<Car> cars = CollectionModel.of(
       collection,
       linkTo(methodOn(CarController.class).getCarByColor(null)).withSelfRel(),
       linkTo(methodOn(CarController.class).getCarByColor(null))
         .withRel("searchByBrand")
     );
     return new ResponseEntity<>(cars, HttpStatus.OK);
+  }
+
+  private Car addLinks(Long id, Car car) {
+    car.add(linkTo(methodOn(CarController.class).getCar(id)).withSelfRel());
+    car.add(linkTo(methodOn(CarController.class).getCar(id)).withRel("car"));
+    car.add(
+      linkTo(methodOn(CarController.class).getOwnerOfCar(id)).withRel("owner")
+    );
+    return car;
   }
 }

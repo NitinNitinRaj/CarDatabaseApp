@@ -4,10 +4,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import com.nr.cardatabase.entities.Owner;
-import com.nr.cardatabase.representationalModels.OwnerRepresentationalModel;
 import com.nr.cardatabase.service.OwnerService;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -31,13 +29,13 @@ public class OwnerController {
   private final OwnerService ownerService;
 
   @GetMapping
-  public ResponseEntity<CollectionModel<OwnerRepresentationalModel>> getOwners() {
-    List<OwnerRepresentationalModel> collection = ownerService
+  public ResponseEntity<CollectionModel<Owner>> getOwners() {
+    List<Owner> collection = ownerService
       .getAllOwners()
       .stream()
-      .map(OwnerRepresentationalModel::new)
+      .map(owner -> addLinks(owner.getId(), owner))
       .collect(Collectors.toList());
-    CollectionModel<OwnerRepresentationalModel> owners = CollectionModel.of(
+    CollectionModel<Owner> owners = CollectionModel.of(
       collection,
       linkTo(methodOn(OwnerController.class).getOwners()).withSelfRel(),
       linkTo(methodOn(OwnerController.class).getOwners()).withRel("owners"),
@@ -48,11 +46,9 @@ public class OwnerController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<OwnerRepresentationalModel> getOwner(
-    @PathVariable Long id
-  ) {
+  public ResponseEntity<Owner> getOwner(@PathVariable Long id) {
     return new ResponseEntity<>(
-      new OwnerRepresentationalModel(ownerService.getOwner(id)),
+      addLinks(id, ownerService.getOwner(id)),
       HttpStatus.OK
     );
   }
@@ -64,23 +60,36 @@ public class OwnerController {
   }
 
   @PostMapping
-  public ResponseEntity<OwnerRepresentationalModel> postCar(
-    @Valid @RequestBody Owner owner
-  ) {
+  public ResponseEntity<Owner> postCar(@Valid @RequestBody Owner owner) {
+    Owner savedOwner = ownerService.saveOwner(owner);
     return new ResponseEntity<>(
-      new OwnerRepresentationalModel(ownerService.saveOwner(owner)),
+      addLinks(savedOwner.getId(), savedOwner),
       HttpStatus.CREATED
     );
   }
 
   @PutMapping("/{id}")
-  public ResponseEntity<OwnerRepresentationalModel> putCar(
+  public ResponseEntity<Owner> putCar(
     @Valid @RequestBody Owner owner,
     @PathVariable Long id
   ) {
+    Owner savedOwner = ownerService.updateOwner(owner, id);
     return new ResponseEntity<>(
-      new OwnerRepresentationalModel(ownerService.updateOwner(owner, id)),
+      addLinks(savedOwner.getId(), savedOwner),
       HttpStatus.OK
     );
+  }
+
+  public static Owner addLinks(Long id, Owner owner) {
+    owner.add(
+      linkTo(methodOn(OwnerController.class).getOwner(id)).withSelfRel()
+    );
+    owner.add(
+      linkTo(methodOn(OwnerController.class).getOwner(id)).withRel("owner")
+    );
+    owner.add(
+      linkTo(methodOn(CarController.class).getOwnersCar(id)).withRel("cars")
+    );
+    return owner;
   }
 }
