@@ -52,9 +52,8 @@ function AddCar({ onChange }) {
         })
       })
     })
-
     if (response.status === 201) {
-      onChange(newCar)
+      onChange(response.data)
       toast.success("Succesffully added a new car.", {
         position: "bottom-left",
       })
@@ -148,19 +147,14 @@ function AddCar({ onChange }) {
         </DialogContent>
         <DialogActions>
           <Button
-            variant="outlined"
+            variant="text"
             color="warning"
             size="small"
             onClick={handleClose}
           >
             Cancel
           </Button>
-          <Button
-            variant="outlined"
-            color="success"
-            size="small"
-            onClick={onSave}
-          >
+          <Button variant="text" color="success" size="small" onClick={onSave}>
             Save
           </Button>
         </DialogActions>

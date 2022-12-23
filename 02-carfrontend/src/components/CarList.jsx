@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useState } from "react"
 import CarApi from "../apis/CarApi"
 import { getComparator, stableSort } from "../helper/SortingFunc"
-import EnhancedTableHead from "./TableHead"
+import EnhancedTableHead from "./EnhancedTableHead"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import AddCar from "./AddCar"
@@ -88,7 +88,7 @@ function CarList() {
 
       if (response.status === 204) {
         const updatedCarList = cars.filter((car) => car.id !== id)
-        setCars([...updatedCarList])
+        fetchCars()
         toast.warning("Car Deleted", {
           position: toast.POSITION.BOTTOM_LEFT,
         })
@@ -101,66 +101,68 @@ function CarList() {
     fetchCars()
   }
 
+  const reactTable = (
+    <Box>
+      <TableContainer>
+        <Table aria-labelledby="tableTitle">
+          <EnhancedTableHead
+            order={order}
+            orderBy={orderBy}
+            onRequestSort={handleRequestSort}
+            rowCount={cars.length}
+          />
+          <TableBody>
+            {stableSort(cars, getComparator(order, orderBy))
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row) => {
+                return (
+                  <TableRow hover key={row.id}>
+                    <TableCell
+                      align="right"
+                      padding="none"
+                      component="th"
+                      scope="row"
+                    >
+                      {row.id}
+                    </TableCell>
+                    <TableCell align="right">{row.brand}</TableCell>
+                    <TableCell align="right">{row.model}</TableCell>
+                    <TableCell align="right">{row.color}</TableCell>
+                    <TableCell align="right">{row.year}</TableCell>
+                    <TableCell align="right">{row.price}</TableCell>
+                    <TableCell align="right" padding="normal">
+                      {row.registerNumber}
+                    </TableCell>
+                    <TableCell align="right">
+                      <Button
+                        onClick={() => onDelClick(row._links.self.href, row.id)}
+                        variant="outlined"
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[4, 8, 16]}
+        component="div"
+        count={cars.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </Box>
+  )
+
   return (
     <div>
       <AddCar onChange={addNewCar} />
-      <Box>
-        <TableContainer>
-          <Table aria-labelledby="tableTitle">
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={cars.length}
-            />
-            <TableBody>
-              {stableSort(cars, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => {
-                  return (
-                    <TableRow hover key={row.id}>
-                      <TableCell
-                        align="right"
-                        padding="none"
-                        component="th"
-                        scope="row"
-                      >
-                        {row.id}
-                      </TableCell>
-                      <TableCell align="right">{row.brand}</TableCell>
-                      <TableCell align="right">{row.model}</TableCell>
-                      <TableCell align="right">{row.color}</TableCell>
-                      <TableCell align="right">{row.year}</TableCell>
-                      <TableCell align="right">{row.price}</TableCell>
-                      <TableCell align="right" padding="normal">
-                        {row.registerNumber}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Button
-                          onClick={() =>
-                            onDelClick(row._links.self.href, row.id)
-                          }
-                          variant="outlined"
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[4, 8, 16]}
-          component="div"
-          count={cars.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Box>
+      {reactTable}
       <ToastContainer autoClose={1500} />
     </div>
   )
