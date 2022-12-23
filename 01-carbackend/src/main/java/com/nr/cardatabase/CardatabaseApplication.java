@@ -43,10 +43,19 @@ public class CardatabaseApplication implements CommandLineRunner {
     List<Car> cars = List.of(
       new Car("Ford", "Mustang", "Red", "ADF-1121", 2017, 59000, owner1),
       new Car("Nissan", "Leaf", "White", "SSJ-3002", 2014, 29000, owner2),
-      new Car("Toyota", "Prius", "Silver", "KKO-0212", 2018, 39000, owner1)
+      new Car("Toyota", "Prius", "Silver", "KKO-0212", 2018, 39000, owner1),
+      new Car("Tesla", "S", "Silver", "KSL-0487", 2019, 90000, owner2),
+      new Car("Rivian", "Truck", "Green", "FAD-0472", 2020, 100000, owner1),
+      new Car("Tesla", "Roadster", "White", "JKF-0212", 2022, 150000, owner2),
+      new Car("Tata", "Nano", "Pink", "ZDF-0258", 2011, 2000, owner1)
     );
     carRepository.saveAll(cars);
-    userRepository.save(new User("nitin", "$2a$10$gvQyvGSQlz0Xg5jARpYEXOUeyhzftJT7neXe/LUJ4muKJybxxawsy"));
+    userRepository.save(
+      new User(
+        "nitin",
+        "$2a$10$gvQyvGSQlz0Xg5jARpYEXOUeyhzftJT7neXe/LUJ4muKJybxxawsy"
+      )
+    );
   }
 
   @Bean

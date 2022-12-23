@@ -43,10 +43,12 @@ public class Car extends RepresentationModel<Car> {
   private String registerNumber;
 
   @NotNull
+  @Min(value = 1, message = "Invlaid Year")
   @Column(name = "model_year")
   private int year;
 
   @NotNull
+  @Min(value = 1, message = "Invlaid Price")
   @Min(value = 0L, message = "Price cannot be negative")
   private double price;
 
