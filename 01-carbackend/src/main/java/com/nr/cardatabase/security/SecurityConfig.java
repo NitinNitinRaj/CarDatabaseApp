@@ -30,19 +30,13 @@ public class SecurityConfig {
       customAuthenticationManger
     );
     authenticationFilter.setFilterProcessesUrl("/authenticate");
+
     http
-      .csrf()
-      .disable()
       .cors()
       .and()
-      .authorizeRequests()
-      .anyRequest()
-      .permitAll();
-    /*   http
       .headers()
       .frameOptions()
       .disable()
-      .cors()
       .and()
       .csrf()
       .disable()
@@ -58,7 +52,7 @@ public class SecurityConfig {
       .addFilter(authenticationFilter)
       .addFilterAfter(new JWTAuthorizationFilter(), AuthenticationFilter.class)
       .sessionManagement()
-      .sessionCreationPolicy(SessionCreationPolicy.STATELESS);*/
+      .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
     return http.build();
   }
 

@@ -6,37 +6,31 @@ import Box from "@mui/material/Box"
 const headCells = [
   {
     id: "id",
-
     disablePadding: true,
     label: "ID",
   },
   {
     id: "brand",
-
     disablePadding: false,
     label: "Brand",
   },
   {
     id: "model",
-
     disablePadding: false,
     label: "Model",
   },
   {
-    id: "Color",
-
+    id: "color",
     disablePadding: false,
-    label: "color",
+    label: "Color",
   },
   {
     id: "year",
-
     disablePadding: false,
     label: "Year",
   },
   {
     id: "price",
-
     disablePadding: false,
     label: "Price",
   },
@@ -46,7 +40,12 @@ const headCells = [
     label: "Rg No.",
   },
   {
-    id: "_links",
+    id: "edit",
+    disablePadding: false,
+    label: "",
+  },
+  {
+    id: "delete",
     disablePadding: false,
     label: "",
   },
@@ -62,7 +61,7 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         {headCells.map((headCell) =>
-          headCell.id !== "_links" ? (
+          headCell.id !== ("delete" || "edit") ? (
             <TableCell
               key={headCell.id}
               align="right"

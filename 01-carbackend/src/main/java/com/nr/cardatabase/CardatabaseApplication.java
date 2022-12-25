@@ -18,11 +18,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @AllArgsConstructor
 @SpringBootApplication
-public class CardatabaseApplication implements CommandLineRunner {
+public class CardatabaseApplication /*implements CommandLineRunner*/{
 
-  private final CarRepository carRepository;
-  private final OwnerRepository ownerRepository;
-  private final UserRepository userRepository;
+  // private final CarRepository carRepository;
+  // private final OwnerRepository ownerRepository;
+  // private final UserRepository userRepository;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(
     CardatabaseApplication.class
@@ -33,10 +33,9 @@ public class CardatabaseApplication implements CommandLineRunner {
     LOGGER.info("Spring Boot App has started");
   }
 
+  /* 
   @Override
   public void run(String... args) throws Exception {
-    ownerRepository.deleteAll();
-    carRepository.deleteAll();
     Owner owner1 = new Owner("John", "Johnson");
     Owner owner2 = new Owner("Mary", "Robinson");
     ownerRepository.saveAll(List.of(owner1, owner2));
@@ -57,6 +56,7 @@ public class CardatabaseApplication implements CommandLineRunner {
       )
     );
   }
+  */
 
   @Bean
   public BCryptPasswordEncoder bCryptPasswordEncoder() {

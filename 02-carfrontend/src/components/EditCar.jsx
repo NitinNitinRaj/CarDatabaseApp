@@ -7,23 +7,13 @@ import React, { useState } from "react"
 import CarApi from "../apis/CarApi"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
-function AddCar({ onChange }) {
-  const [open, setOpen] = useState(false)
-  const [car, setCars] = useState({
-    brand: "",
-    model: "",
-    color: "",
-    registerNumber: "",
-    year: "",
-    price: "",
-  })
+function EditCar({ onChange, savedCar, setIsEditOpen }) {
+  const [open, setOpen] = useState(true)
+  const [car, setCars] = useState(savedCar)
 
   const handleClose = () => {
     setOpen(false)
-  }
-
-  const handleOpen = () => {
-    setOpen(true)
+    setIsEditOpen(false)
   }
 
   const handleChange = (event) => {
@@ -31,9 +21,9 @@ function AddCar({ onChange }) {
   }
 
   const addCar = async (car) => {
-    const token = sessionStorage.getItem("jwt")
     const newCar = { ...car, year: Number(car.year), price: Number(car.price) }
-    const response = await CarApi.post("/cars", newCar, {
+    const token = sessionStorage.getItem("jwt")
+    const response = await CarApi.put("/cars/" + newCar.id, newCar, {
       headers: {
         "Content-Type": "application/json",
         Authorization: token,
@@ -53,9 +43,9 @@ function AddCar({ onChange }) {
         })
       })
     })
-    if (response.status === 201) {
+    if (response.status === 200) {
       onChange(response.data)
-      toast.success("Succesffully added a new car.", {
+      toast.success("Succesffully edited the car.", {
         position: "bottom-left",
       })
     }
@@ -64,29 +54,13 @@ function AddCar({ onChange }) {
   const onSave = () => {
     handleClose()
     addCar(car)
-    setCars({
-      ...car,
-      brand: "",
-      model: "",
-      color: "",
-      registerNumber: "",
-      year: "",
-      price: "",
-    })
+    setIsEditOpen(false)
   }
 
   return (
     <div>
-      <Button
-        style={{ margin: 10 }}
-        variant="contained"
-        color="primary"
-        onClick={handleOpen}
-      >
-        New Car
-      </Button>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>New Car</DialogTitle>
+        <DialogTitle>Edit Car</DialogTitle>
         <DialogContent>
           <FormControl>
             <TextField
@@ -171,4 +145,4 @@ function AddCar({ onChange }) {
   )
 }
 
-export default AddCar
+export default EditCar
