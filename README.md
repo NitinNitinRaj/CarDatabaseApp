@@ -21,6 +21,7 @@ Bean Validation
 
 Getting Started
 Server
+First, make sure you have all the requirements installed and a MariaDB database running. Then, create a new database and user for the app, and add the database connection details to the application.properties file in the src/main/resources directory.
 To run the server, navigate to the server directory and run the following command:
 mvn spring-boot:run
 This will start the server on port 8080.
